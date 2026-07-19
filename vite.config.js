@@ -5,6 +5,7 @@ export default defineConfig({
     plugins: [solid()],
     base: "./",
     build: {
-        base: command === "build" ? "/mplr/" : "/",
+        plugins: [solid()],
+        base: "/mplr/",
     }
 });
