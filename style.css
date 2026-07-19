@@ -55,17 +55,16 @@ body {
     scrollbar-color: transparent;
 }
 
-
 @font-face {
-    font-family: 'Material Symbols Rounded';
+    font-family: "Material Symbols Rounded";
     font-style: normal;
-    src: url("assets/icons.woff2") format('woff2');
+    src: url("./assets/icons.woff2") format("woff2");
 }
 
 @font-face {
     font-family: "Google Sans";
     font-style: normal;
-    src: url("assets/google_sans.ttf") format('truetype');
+    src: url("./assets/google_sans.ttf") format("truetype");
 }
 
 .x,
