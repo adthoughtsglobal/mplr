@@ -1,11 +1,7 @@
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     plugins: [solid()],
-    base: "./",
-    build: {
-        plugins: [solid()],
-        base: "/mplr/",
-    }
-});
+    base: command === "build" ? "/mplr/" : "/",
+}));
