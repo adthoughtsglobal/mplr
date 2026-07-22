@@ -4,8 +4,10 @@ import { engine } from "../store/player.js";
 import { isAudio } from "../lib/track.js";
 import TrackRow from "./TrackRow.jsx";
 
+import { authenticateRotur, initRoturStatus } from "../lib/roturStatus.js";
 
-function selectFolder() {
+
+function rselectFolder() {
     const input = document.createElement("input");
     input.type = "file";
     input.webkitdirectory = true;
@@ -16,6 +18,60 @@ function selectFolder() {
         engine.loadLibrary(files);
     };
     input.click();
+}
+
+function rselectFiles() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.multiple = true;
+    input.accept = "audio/*";
+
+    input.onchange = () => {
+        const files = Array.from(input.files || []);
+        engine.loadLibrary(files);
+    };
+
+    input.click();
+}
+
+function ImportButton() {
+    const [open, setOpen] = createSignal(false);
+
+    const selectFolder = () => {
+        setOpen(false);
+        rselectFolder();
+    };
+
+    const selectFiles = () => {
+        setOpen(false);
+        rselectFiles();
+    };
+
+    return (
+        <div class="dropdown btn">
+            <div
+                class="btn"
+                data-tooltip="Import music"
+                onClick={() => setOpen(!open())}
+            >
+                <div class="icon">music_note_add</div>
+            </div>
+
+            {open() && (
+                <div class="dropdown-menu">
+                    <div class="dropdown-item" onClick={selectFolder}>
+                        Import Folder
+                    </div>
+                    <div class="dropdown-item" onClick={selectFiles}>
+                        Import Files
+                    </div>
+                    <div class="dropdown-item" onClick={engine.clearLibrary}>
+                        Clear Imports
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default function LibraryPane() {
@@ -43,16 +99,25 @@ export default function LibraryPane() {
                 <div class="actions x">
                     <div
                         class="btn"
+                        data-tooltip="Share Rich Presence to Rotur"
+                        onClick={async () => {
+                            await authenticateRotur();
+                            initRoturStatus();
+                        }}
+                    >
+                        <div class="icon">full_coverage</div>
+                    </div>
+                    <div
+                        class="btn"
                         onClick={() => setView(view() === "list" ? "grid" : "list")}
+                        data-tooltip="Change view"
                     >
                         <div class="icon">
                             {view() === "list" ? "grid_view" : "view_list"}
                         </div>
                     </div>
 
-                    <div class="btn" onClick={selectFolder}>
-                        <div class="icon">music_note_add</div>
-                    </div>
+                    <ImportButton />
                 </div>
             </div>
 
@@ -73,7 +138,9 @@ export default function LibraryPane() {
                     grid: view() === "grid"
                 }}
             >
-                <For each={filtered()}>
+                <For each={filtered()} fallback={
+                    <small className="emptyText">Click on <span className="icon">music_note_add</span> to add music</small>
+                }>
                     {track => (
                         <TrackRow
                             track={track}

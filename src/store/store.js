@@ -19,6 +19,7 @@ const [store, setStore] = createStore({
     activeLyricIndex: -1,
     page: 0,
     loadingLibrary: false,
+    roturPresence: true,
     viz: {
         name: "wave",
         sensitivity: 1.5,

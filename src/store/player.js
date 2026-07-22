@@ -59,7 +59,6 @@ class PlayerEngine {
         this.startTime = 0;
         this.pauseOffset = 0;
 
-        this.player.onended = () => this.next();
 
         this._activeLyricIndex = -1;
         this._tick();
@@ -102,12 +101,12 @@ class PlayerEngine {
         if (this.player.buffer) this.player.stop();
         this.player.dispose();
 
-        this.player = new Tone.Player(track.url);
+        this.player = new Tone.Player();
         this.effects.connectSource(this.player);
 
         this.player.onended = () => this.next();
 
-        await this.player.load();
+        await this.player.load(track.url);
         await this._loadLyrics(track);
 
         if (isNewTrack) this.pauseOffset = 0;
@@ -139,6 +138,7 @@ class PlayerEngine {
     async playByTrack(track) {
         const index = store.library.indexOf(track);
         if (index === -1) return;
+
         await this.play(index);
     }
 
@@ -176,10 +176,21 @@ class PlayerEngine {
 
     seek(sec) {
         if (!this.current()) return;
-        this.player.stop();
+
+        const wasPlaying = this.player.state === "started";
+
+        if (wasPlaying) {
+            this.player.stop();
+        }
+
         this.pauseOffset = Math.max(0, sec);
-        this.startTime = Tone.now();
-        this.player.start(0, this.pauseOffset);
+
+        if (wasPlaying) {
+            this.startTime = Tone.now();
+            this.player.start(Tone.now(), this.pauseOffset);
+        }
+
+        setStore("currentTime", this.pauseOffset);
     }
 
     seekBy(delta) {
@@ -209,6 +220,27 @@ class PlayerEngine {
 
     toggleRepeat() {
         setStore("repeat", r => (r + 1) % 3);
+    }
+
+    clearLibrary() {
+        if (this.player.state === "started") {
+            this.player.stop();
+        }
+
+        this.pauseOffset = 0;
+        this.startTime = 0;
+        this._activeLyricIndex = -1;
+
+        setStore(produce(s => {
+            s.library = [];
+            s.queue = [];
+            s.currentIndex = -1;
+            s.playing = false;
+            s.currentTime = 0;
+            s.duration = 0;
+            s.lyrics = [];
+            s.activeLyricIndex = -1;
+        }));
     }
 
     async _loadLyrics(track) {
@@ -241,6 +273,18 @@ class PlayerEngine {
 
         const current = this.getCurrentTime();
         const total = track.duration || 0;
+
+        if (
+            store.playing &&
+            total > 0 &&
+            current >= total - 0.1 &&
+            !this._advancing
+        ) {
+            this._advancing = true;
+            this.next().finally(() => {
+                this._advancing = false;
+            });
+        }
 
         setStore(produce(s => {
             s.currentTime = current;

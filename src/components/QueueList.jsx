@@ -10,7 +10,9 @@ export default function QueueList() {
 
     return (
         <div id="queue" class="list">
-            <For each={store.queue}>
+            <For each={store.queue} fallback={
+                    <small className="emptyText">Click on <span className="icon">subdirectory_arrow_right</span> to add music to queue</small>
+                }>
                 {(track, i) => (
                     <div
                         class="track"

@@ -8,6 +8,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "blueimp-md5": "^2.19.0",
     "solid-js": "^1.9.3",
     "tone": "^15.0.4"
   },

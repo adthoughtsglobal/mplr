@@ -9,7 +9,6 @@ export default function TrackRow(props) {
         if (!p.showActive) return false;
         return store.library[store.currentIndex] === p.track;
     }
-
     return (
         <div class="track" classList={{ active: isActive() }}>
             <div class="cover" onClick={() => engine.playByTrack(props.track)}>
@@ -57,10 +56,6 @@ export default function TrackRow(props) {
                                 <span class="icon">close</span>
                             </div>
                         )}
-
-                        <div class="btn">
-                            <span class="icon">more_vert</span>
-                        </div>
                     </div>
                 </div>
             </div>

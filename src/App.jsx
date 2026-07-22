@@ -6,11 +6,17 @@ import FloatingPlayer from "./components/FloatingPlayer.jsx";
 import VisualizerPage from "./components/VisualizerPage.jsx";
 import Tooltip from "./components/Tooltip.jsx";
 import { updateTitle } from "./lib/titlebar.js";
+import { initRoturStatus } from "./lib/roturStatus";
+
 
 export default function App() {
     onMount(() => {
         document.body.addEventListener("click", () => Tone.start(), { once: true });
         updateTitle();
+        initRoturStatus(
+            localStorage.roturToken,
+            ["mplr"]
+        );
     });
 
     return (
